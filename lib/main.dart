@@ -38,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
       text: 'ADAM#' + DateTime.now().millisecondsSinceEpoch.toString());
   final TextEditingController _roomNameController =
       TextEditingController(text: 'test-room');
+  TwilioRoomType _roomType = TwilioRoomType.peerToPeer;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -47,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
         identity: this._usernameController.text,
         name: this._roomNameController.text,
         token: TWILIO_TOKEN,
-        type: TwilioRoomType.groupSmall,
+        type: this._roomType,
       );
       Navigator.of(context).push(
         MaterialPageRoute<ConferencePage>(
@@ -61,6 +62,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final validator =
       (String value) => value?.isEmpty == true ? 'Required' : null;
+
+  _onSelectRoomType(value) {
+    setState(() {
+      this._roomType = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +93,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 validator: validator,
                 decoration: InputDecoration(labelText: 'input room name'),
               ),
+              DropdownButton(
+                  underline: Container(
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                  isExpanded: true,
+                  items: TwilioRoomType.values.map<DropdownMenuItem<TwilioRoomType>>(
+                      (TwilioRoomType value) {
+                    return DropdownMenuItem<TwilioRoomType>(
+                      value: value,
+                      child: Text(RoomModel.getTypeText(value)),
+                    );
+                  }).toList(),
+                  value: this._roomType,
+                  onChanged: this._onSelectRoomType,
+                ),
               RaisedButton.icon(
                 onPressed: this._connectToRoom,
                 color: Colors.blue[400],
